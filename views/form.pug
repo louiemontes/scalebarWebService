@@ -1,0 +1,25 @@
+extends layout
+
+block content
+  span(class='centeringTitle')
+    h1= title
+    p Welcome to #{title}
+  form(action='/form', method='POST' class='centeringForm')
+    p
+      p  First Name:
+      input(type='text', name='first_name', value='')
+      p  Last Name:
+      input(type='text', name='last_name', value='')
+
+      p  Age:
+      input(type='number', name='age', value='')
+      p Gender:
+        p Male:
+          input(type='radio', name='gender', value='Male')
+        p Female:
+          input(type='radio', name='gender', value='Female')
+        p  Prefer not to answer:
+          input(type='radio', name='gender', value='Other')
+        p(class='errors') #{allErrors}
+    input(type='submit', value='Submit')
+
