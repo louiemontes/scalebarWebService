@@ -4,22 +4,63 @@ block content
   span(class='centeringTitle')
     h1= title
     p Welcome to #{title}
-  form(action='/form', method='POST' class='centeringForm')
+  form(action='/form', method='POST', class='centeringForm')
     p
-      p  First Name:
-      input(type='text', name='first_name', value='')
-      p  Last Name:
-      input(type='text', name='last_name', value='')
+      p First Name: 
+        input(type='text', name='first_name', value='')
+        span(class ="errors")   #{specificErrors[0]}
 
-      p  Age:
-      input(type='number', name='age', value='')
-      p Gender:
-        p Male:
-          input(type='radio', name='gender', value='Male')
-        p Female:
-          input(type='radio', name='gender', value='Female')
-        p  Prefer not to answer:
-          input(type='radio', name='gender', value='Other')
-        p(class='errors') #{allErrors}
-    input(type='submit', value='Submit')
+      p Last Name: 
+        input(type='text', name='last_name', value='')
+        span(class ="errors")   #{specificErrors[1]}
 
+      p Age: 
+        input(type='number', name='age', min='0', value='')
+        span(class ="errors")   #{specificErrors[2]}
+
+      p Gender: 
+        select(name="gender")
+          option(value="")
+          option(value="Male") Male
+          option(value="Female") Female
+          option(value="Prefer not to answer") Prefer not to answer
+        span(class ="errors")   #{specificErrors[3]}
+
+      p Projection String Input (optional): [ 
+        input(type='text', name='extent', title='If providing a projection string, an extent in the form (minlat, minlon, maxlat, maxlon) is also required.')
+        span  ]
+
+      p Longitude Major Ticks: [ 
+        input(type='text', name='lon_major_ticks', value="25, 50, 75", title='Distance(s) at which major ticks are to be drawn and labeled.')
+        span  ]
+        span(class ="errors")   #{specificErrors[4]}
+
+      p Longitude Minor Ticks: [ 
+        input(type='text', name='lon_minor_ticks', value="12.5", title='Distance(s) at which minor ticks are to be drawn, but not labeled.')
+        span  ]
+        span(class ="errors")   #{specificErrors[5]}
+
+      p Number Of Nodes: 
+        input(type='number', name='nnodes', value='51', min='1', title='Number of nodes at which to draw verticals.  More nodes results in smoother plots.')
+        span(class ="errors")   #{specificErrors[6]}
+
+      p Clip Latitude At: 
+        input(type='number', name='cliplat', value='0.0', step='0.1', min='-90', max='90', title='Latitude at which to clip the plot, e.g. 0.0 to generate a scale bar for the northern hemisphere.  Set to -90.0 for south polar stereographic.')
+        span(class ="errors")   #{specificErrors[7]}
+
+      p Latitude Tick Interval: 
+        input(type='number', name='lat_tick_interval', value='5', min='1', max='90', title='Interval at which latitudinal lines are drawn, e.g. every 5 degrees.')
+        span(class ="errors")   #{specificErrors[8]}
+
+      p Mapscale: 1/( 
+        input(type='number', name='mapscale', value="1000000", min='1', title='Map scale in fractional form, e.g. 1/1000000')
+        span  )
+        span(class ="errors")   #{specificErrors[9]}
+
+      p Height: 
+        input(type='number', name='height', value='4.0', min='1', title='Scalebar height in cm.')
+        span  cm
+        span(class ="errors")   #{specificErrors[10]}
+
+    button(class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect", type='submit', title='Submit your requests')
+      i(class="material-icons") send

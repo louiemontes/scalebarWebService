@@ -1,7 +1,11 @@
 extends layout
 
 block content
-  h1= title
-  p Welcome to #{title}
-  p Check out the hotel entry:
-  a(href='/form') Form
+  span(class="centeringForm")
+    h1= title
+    p Welcome to #{title}
+    p Check out the hotel entry: 
+      br
+      br
+      br
+      a(class="mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect", href='/form') Form
