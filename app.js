@@ -4,19 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
-// might be removing the following:
 
-/*
-      p Gender:
-        span(class ="errors")   #{specificErrors[3]}
-        p Male:
-          input(type='radio', name='gender', value='Male')
-        p Female:
-          input(type='radio', name='gender', value='Female')
-        p  Prefer not to answer:
-          input(type='radio', name='gender', value='Prefer not answer')
-
-*/
 var index = require('./routes/index');
 var users = require('./routes/users');
 var form = require('./routes/form');
@@ -56,7 +44,6 @@ app.post('/form', urlencodedParser, function(req,res){
 
   req.sanitizeBody('last_name').escape();
   req.sanitizeBody('age').escape();
-  req.sanitizeBody('gender').escape();
   // super important... unless you want cross scripting
   // buddy, that's an open text box.
   // * usually my personal go to for starting trouble on someone else's app *
@@ -71,8 +58,7 @@ app.post('/form', urlencodedParser, function(req,res){
   req.sanitizeBody('lat_tick_interval').escape();
   req.sanitizeBody('mapscale').escape();
   req.sanitizeBody('height').escape();
-  //req.sanitizeBody('gender').escape();
-  //req.sanitizeBody('gender').escape();
+  req.sanitizeBody('fontsize').escape();
 
 
   // make server check input in order of priority
@@ -84,9 +70,6 @@ app.post('/form', urlencodedParser, function(req,res){
   // age checks
   req.checkBody("age", "Input an age.").notEmpty();
   req.checkBody("age", "Invalid age.").isInt();
-
-  // the controversial check
-  req.checkBody("gender", "Select a gender.").notEmpty();
 
   // no check for the optional string field.. but it was sanitized so no worry
 
@@ -107,10 +90,11 @@ app.post('/form', urlencodedParser, function(req,res){
 
   req.checkBody("height", "Input a value for Height.").notEmpty();
 
+  req.checkBody("fontsize", "Input a value for Font Size.").notEmpty();
 
   var errors = req.validationErrors();
   let errorHolder = [];
-  for (let i=0; i < 8; i++) {
+  for (let i=0; i < 10; i++) {
     errorHolder[i] = "";
   }
   let errorsString = "";
@@ -122,7 +106,6 @@ app.post('/form', urlencodedParser, function(req,res){
     let hasFirstNameError = false;
     let hasLastNameError = false;
     let hasAgeError = false;
-    let hasGenderError = false;
 
     // new error possibilities for Jay
     let hasextentError = false;
@@ -133,6 +116,7 @@ app.post('/form', urlencodedParser, function(req,res){
     let haslat_tick_intervalError = false;
     let hasmapscaleError = false;
     let hasheightError = false;
+    let hasfontsizeError= false;
 
     // chain errors, and maintain error priority
     for (let i = 0; i< errors.length; i++) {
@@ -148,52 +132,66 @@ app.post('/form', urlencodedParser, function(req,res){
         hasAgeError = true;
         errorsString += errors[i].msg + "\n";
         errorHolder[2] = errors[i].msg;
-
-      } else if(errors[i].param === "gender" && !hasGenderError) {
-        hasGenderError = true;
-        errorsString += errors[i].msg + "\n";
-        errorHolder[3] = errors[i].msg;
-
       } else if(errors[i].param === "lon_major_ticks" && !haslon_major_ticksError) {
         haslon_major_ticksError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[4] = errors[i].msg;
+        errorHolder[3] = errors[i].msg;
 
       } else if(errors[i].param === "lon_minor_ticks" && !haslon_minor_ticksError) {
         haslon_major_ticksError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[5] = errors[i].msg;
+        errorHolder[4] = errors[i].msg;
 
       } else if(errors[i].param === "nnodes" && !hasnnodesError) {
         hasnnodesError= true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[6] = errors[i].msg;
+        errorHolder[5] = errors[i].msg;
 
       } else if(errors[i].param === "cliplat" && !hascliplatError) {
         hascliplatError= true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[7] = errors[i].msg;
+        errorHolder[6] = errors[i].msg;
 
       } else if(errors[i].param === "lat_tick_interval" && !haslat_tick_intervalError) {
         haslat_tick_intervalError= true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[8] = errors[i].msg;
+        errorHolder[7] = errors[i].msg;
 
       } else if(errors[i].param === "mapscale" && !hasmapscaleError) {
         hasmapscaleError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[9] = errors[i].msg;
+        errorHolder[8] = errors[i].msg;
 
       } else if(errors[i].param === "height" && !hasheightError) {
+        hasheightError = true;
+        errorsString += errors[i].msg + "\n";
+        errorHolder[9] = errors[i].msg;
+
+      } else if(errors[i].param === "fontsize" && !hasfontsizeError) {
         hasheightError = true;
         errorsString += errors[i].msg + "\n";
         errorHolder[10] = errors[i].msg;
 
       }
     }
+     inputHolder = [
+       req.body.first_name,
+       req.body.last_name,
+       req.body.age,
+       req.body.lon_major_ticks,
+       req.body.lon_minor_ticks,
+       req.body.nnodes,
+       req.body.cliplat,
+       req.body.lat_tick_interval,
+       req.body.mapscale,
+       req.body.height,
+       req.body.fontsize
+
+     ]
      res.render('form', {
        title: "Form",
-       specificErrors: errorHolder
+       specificErrors: errorHolder,
+       specificInputs: inputHolder
      });
 
 
@@ -207,14 +205,14 @@ app.post('/form', urlencodedParser, function(req,res){
       req.body.first_name,
       req.body.last_name,
       req.body.age,
-      req.body.gender,
       req.body.lon_major_ticks,
       req.body.lon_minor_ticks,
       req.body.nnodes,
       req.body.cliplat,
       req.body.lat_tick_interval,
       req.body.mapscale,
-      req.body.height
+      req.body.height,
+      req.body.fontsize
     ]
      res.render("dataDisplay", {entries: entryHolder});
 
