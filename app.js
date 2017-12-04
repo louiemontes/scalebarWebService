@@ -43,6 +43,7 @@ app.post('/form', urlencodedParser, function(req,res){
   console.log("After sanitized " + req.body.first_name);
 
   req.sanitizeBody('last_name').escape();
+  // removed gender field (not necessary really)
   req.sanitizeBody('age').escape();
   // super important... unless you want cross scripting
   // buddy, that's an open text box.
