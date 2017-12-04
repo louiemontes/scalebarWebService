@@ -14,11 +14,14 @@ html
 
           div(class="mdl-layout-spacer")
           nav(class="mdl-navigation mdl-layout--large-screen-only")
-            a(class="mdl-navigation__link" href="") Link
+            a(class="mdl-navigation__link" href='/') 
+              button(class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect", type='submit', title='Submit your requests')
+                i(class="material-icons") home
       div(class="mdl-layout__drawer")
         span(class="mdl-layout-title") Scalebar Reciever
         nav(class="mdl-navigation")
-         a(class="mdl-navigation__link" href="") Link
+         a(class="mdl-navigation__link" href="/") Go home
+         a(class="mdl-navigation__link" href="https://astrogeology.usgs.gov/") Go to USGS-Astrogeology
       main(class="mdl-layout__content")
         div(class="page-content")
           block content

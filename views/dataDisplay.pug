@@ -1,46 +1,34 @@
 extends layout
 
 block content
-  p
-    h1 Here are your Entries:
-  p
-    h3 First Name:
-    |  #{entries[0]}
-  p
-    h3 Last Name:
-    |  #{entries[1]}
+  span(class="centeringForm")
+    p
+      h1 Entered
+    p
+      h5 First Name:
+        p #{entries[0]}
+      h5 Last Name:
+        p #{entries[1]}
+      h5 Age:
+        p #{entries[2]}
+      h5 Gender:
+        p #{entries[3]}
+      h5 Longitude Major Ticks:
+        p [ #{entries[4]} ]
+      h5 Longitude Minor Ticks:
+        p [ #{entries[5]} ]
+      h5 Number Of Nodes:
+        p #{entries[6]}
+      h5 Clip Latitude At:
+        p #{entries[7]}
+      h5 Latitude Tick Interval:
+        p #{entries[8]}
+      h5 Mapscale:
+        p  1/#{entries[9]}
+      h5 Height:
+        p #{entries[10]} cm
 
-  p
-    h3 Age:
-    |  #{entries[2]}
-  p
-    h3 Gender:
-    |  #{entries[3]}
-  p
-    h3 Longitude Major Ticks:
-    |  #{entries[4]}
-  p
-    h3 Longitude Minor Ticks:
-    |  #{entries[5]}
-  p
-    h3 Number Of Nodes:
-    |  #{entries[6]}
-
-  p
-    h3 Clip Latitude At:
-    |  #{entries[7]}
-
-
-  p
-    h3 Latitude Tick Interval:
-    |  #{entries[8]}
-  p
-    h3 Mapscale:
-    |  1/
-    |  #{entries[9]}
-  p
-    h3 Height:
-    |  #{entries[10]}
-    |  cm
-
-  a(href='/form') Type in new entry
+      p
+        a(href='/form') 
+          button(class="mdl-button mdl-js-button mdl-button--fab mdl-button--colored mdl-js-ripple-effect", type='submit', title='Submit your requests')
+            i(class="material-icons") arrow_back 
