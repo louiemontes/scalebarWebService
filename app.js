@@ -37,18 +37,14 @@ app.use('/dataDisplay', dataDisplay);
 //app.use('/formerrors', formerrors);
 
 app.post('/form', urlencodedParser, function(req,res){
-  // santize inputs
-  console.log("Before sanitized " + req.body.first_name);
-  req.sanitizeBody('first_name').escape();
-  console.log("After sanitized " + req.body.first_name);
-
-  req.sanitizeBody('last_name').escape();
-  // removed gender field (not necessary really)
-  req.sanitizeBody('age').escape();
   // super important... unless you want cross scripting
   // buddy, that's an open text box.
   // * usually my personal go to for starting trouble on someone else's app *
-  req.sanitizeBody('extent').escape();
+  req.sanitizeBody('proj_string').escape();
+  req.sanitizeBody('minLat').escape();
+  req.sanitizeBody('minLon').escape();
+  req.sanitizeBody('maxLat').escape();
+  req.sanitizeBody('maxLon').escape();
   req.sanitizeBody('lon_major_ticks').escape();
   req.sanitizeBody('lon_minor_ticks').escape();
   // these others ones still need sanitizing... but less critical since <script> tags
@@ -60,19 +56,22 @@ app.post('/form', urlencodedParser, function(req,res){
   req.sanitizeBody('mapscale').escape();
   req.sanitizeBody('height').escape();
   req.sanitizeBody('fontsize').escape();
+  req.sanitizeBody('padding').escape();
 
 
   // make server check input in order of priority
-  req.checkBody("first_name", "Input a first name.").notEmpty();
-  req.checkBody("first_name", "Invalid first name. First name can only contain letters.").isAlpha();
-  req.checkBody("last_name", "Input a last name.").notEmpty();
-  req.checkBody("last_name", "Invalid last name. Last name can only contain letters.").isAlpha();
+  req.checkBody("proj_string", "Input a projection string.").notEmpty();
 
-  // age checks
-  req.checkBody("age", "Input an age.").notEmpty();
-  req.checkBody("age", "Invalid age.").isInt();
+  req.checkBody("minLat", "Input a minimum latitude value.").notEmpty();
+  req.checkBody("minLon", "Input a minimum longitude value.").notEmpty();
+  req.checkBody("maxLat", "Input a maximum latitude value.").notEmpty();
+  req.checkBody("maxLon", "Input a maximum longitude value.").notEmpty();
 
-  // no check for the optional string field.. but it was sanitized so no worry
+
+  req.checkBody("lon_major_ticks", "Input Longtitude Major Ticks value(s).").notEmpty();
+  req.checkBody("lon_major_ticks", "Input Longtitude Major Ticks value(s).").notEmpty();
+
+
 
   // jay's checks for scalebar
   req.checkBody("lon_major_ticks", "Input Longtitude Major Ticks value(s).").notEmpty();
@@ -93,9 +92,36 @@ app.post('/form', urlencodedParser, function(req,res){
 
   req.checkBody("fontsize", "Input a value for Font Size.").notEmpty();
 
+  req.checkBody("padding", "Input a value for Padding.").notEmpty();
+
+  let inputHolder = [
+    req.body.proj_string,
+
+    req.body.minLat,
+    req.body.minLon,
+    req.body.maxLat,
+    req.body.maxLon,
+
+    req.body.lon_major_ticks,
+    req.body.lon_minor_ticks,
+
+    req.body.nnodes,
+    req.body.cliplat,
+
+    req.body.lat_tick_interval,
+
+    req.body.mapscale,
+
+    req.body.height,
+
+    req.body.fontsize,
+
+    req.body.padding
+  ]
+
   var errors = req.validationErrors();
   let errorHolder = [];
-  for (let i=0; i < 10; i++) {
+  for (let i=0; i < 14; i++) {
     errorHolder[i] = "";
   }
   let errorsString = "";
@@ -104,12 +130,14 @@ app.post('/form', urlencodedParser, function(req,res){
   //
   //console.log(errors);
   if (errors) {
-    let hasFirstNameError = false;
-    let hasLastNameError = false;
-    let hasAgeError = false;
 
     // new error possibilities for Jay
-    let hasextentError = false;
+    let hasproj_stringError = false;
+    let hasminLatError = false;
+    let hasminLonError = false;
+    let hasmaxLatError = false;
+    let hasmaxLonError = false;
+
     let haslon_major_ticksError = false;
     let haslon_minor_ticksError= false;
     let hasnnodesError = false;
@@ -118,105 +146,91 @@ app.post('/form', urlencodedParser, function(req,res){
     let hasmapscaleError = false;
     let hasheightError = false;
     let hasfontsizeError= false;
+    let haspaddingError= false;
 
     // chain errors, and maintain error priority
     for (let i = 0; i< errors.length; i++) {
-      if(errors[i].param === "first_name" && !hasFirstNameError) {
-        hasFirstNameError = true;
+      if(errors[i].param === "proj_string" && !hasproj_stringError) {
+        hasproj_stringsError = true;
         errorsString += errors[i].msg + "\n";
         errorHolder[0] = errors[i].msg;
-      } else if (errors[i].param === "last_name" && !hasLastNameError) {
-        hasLastNameError = true;
+
+
+      } else if(errors[i].param === "minLat" && !hasminLatError) {
+        haslonminLatError = true;
         errorsString += errors[i].msg + "\n";
         errorHolder[1] = errors[i].msg;
-      } else if(errors[i].param === "age" && !hasAgeError){
-        hasAgeError = true;
+      } else if(errors[i].param === "minLon" && !hasminLonError) {
+        hasminLonticksError = true;
         errorsString += errors[i].msg + "\n";
         errorHolder[2] = errors[i].msg;
+      } else if(errors[i].param === "maxLat" && !hasmaxLatError) {
+        hasmaxLatError = true;
+        errorsString += errors[i].msg + "\n";
+        errorHolder[3] = errors[i].msg;
+      } else if(errors[i].param === "maxLon" && !hasmaxLonError) {
+        hasmaxLonError = true;
+        errorsString += errors[i].msg + "\n";
+        errorHolder[4] = errors[i].msg;
+
       } else if(errors[i].param === "lon_major_ticks" && !haslon_major_ticksError) {
         haslon_major_ticksError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[3] = errors[i].msg;
-
+        errorHolder[5] = errors[i].msg;
       } else if(errors[i].param === "lon_minor_ticks" && !haslon_minor_ticksError) {
-        haslon_major_ticksError = true;
+        haslon_minor_ticksError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[4] = errors[i].msg;
+        errorHolder[6] = errors[i].msg;
 
       } else if(errors[i].param === "nnodes" && !hasnnodesError) {
         hasnnodesError= true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[5] = errors[i].msg;
+        errorHolder[7] = errors[i].msg;
 
       } else if(errors[i].param === "cliplat" && !hascliplatError) {
         hascliplatError= true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[6] = errors[i].msg;
+        errorHolder[8] = errors[i].msg;
 
       } else if(errors[i].param === "lat_tick_interval" && !haslat_tick_intervalError) {
         haslat_tick_intervalError= true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[7] = errors[i].msg;
+        errorHolder[9] = errors[i].msg;
 
       } else if(errors[i].param === "mapscale" && !hasmapscaleError) {
         hasmapscaleError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[8] = errors[i].msg;
+        errorHolder[10] = errors[i].msg;
 
       } else if(errors[i].param === "height" && !hasheightError) {
         hasheightError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[9] = errors[i].msg;
+        errorHolder[11] = errors[i].msg;
 
       } else if(errors[i].param === "fontsize" && !hasfontsizeError) {
-        hasheightError = true;
+        hasfontsizeError = true;
         errorsString += errors[i].msg + "\n";
-        errorHolder[10] = errors[i].msg;
+        errorHolder[12] = errors[i].msg;
+
+      } else if(errors[i].param === "padding" && !haspaddingError) {
+        haspaddingError = true;
+        errorsString += errors[i].msg + "\n";
+        errorHolder[13] = errors[i].msg;
 
       }
     }
-     inputHolder = [
-       req.body.first_name,
-       req.body.last_name,
-       req.body.age,
-       req.body.lon_major_ticks,
-       req.body.lon_minor_ticks,
-       req.body.nnodes,
-       req.body.cliplat,
-       req.body.lat_tick_interval,
-       req.body.mapscale,
-       req.body.height,
-       req.body.fontsize
-
-     ]
      res.render('form', {
        title: "Form",
        specificErrors: errorHolder,
        specificInputs: inputHolder
      });
 
-
-     console.log("errorHolder: " + errorHolder[0]);
-     console.log("First Name: " + req.body.first_name);
-     console.log("Last Name (unsantized): " + req.body.first_name);
-
      return;
    } else {
-    entryHolder = [
-      req.body.first_name,
-      req.body.last_name,
-      req.body.age,
-      req.body.lon_major_ticks,
-      req.body.lon_minor_ticks,
-      req.body.nnodes,
-      req.body.cliplat,
-      req.body.lat_tick_interval,
-      req.body.mapscale,
-      req.body.height,
-      req.body.fontsize
-    ]
-     res.render("dataDisplay", {entries: entryHolder});
+     res.render("dataDisplay", {entries: inputHolder});
 
+     // TODO: change padding to padding size and titles everywhere
+     // TODO: Make it happen, cap'n
      // soon will move string "number arrays" to actual number arrays
      // req.body.lon_major_ticks = decipherArraysFromStrings(req.body.lon_major_ticks)
      // req.body.lon_minor_ticks = decipherArraysFromStrigns(req.body.lon_minor_ticks);

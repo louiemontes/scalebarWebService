@@ -22,3 +22,9 @@ a {
   //width:250px;
   text-align:center;
 }
+#proj_stringContainer {
+  vertical-align: middle;
+  resize: both;
+  min-height: 50px;
+  min-width:200px;
+}
