@@ -36,6 +36,34 @@ app.use('/form', form);
 app.use('/dataDisplay', dataDisplay);
 //app.use('/formerrors', formerrors);
 
+
+function decipherArrayFromString(someString) {
+  // we could just say "Ey, seperate multiple values by commas bruv"
+  let rawStringArray = someString.split(",");
+
+  // trim excess spaces users might of put
+  let trimmedStringArray = [];
+  for(let i = 0; i < rawStringArray.length; i++) {
+    trimmedStringArray[i] = rawStringArray[i].trim();
+  }
+
+  // convert to floats
+  let arrayToFloats =[];
+  for (let i = 0; i < trimmedStringArray.length; i++) {
+    arrayToFloats[i] = parseFloat(trimmedStringArray[i]);
+  }
+
+  // remove NaNs
+  let noMoreNaNs = arrayToFloats.filter(item => !isNaN(item));
+  refinedArray = noMoreNaNs;
+
+  if (refinedArray.length === 0) {
+    return "";
+  } else {
+    return refinedArray;
+  }
+}
+
 app.post('/form', urlencodedParser, function(req,res){
   // super important... unless you want cross scripting
   // buddy, that's an open text box.
@@ -56,7 +84,7 @@ app.post('/form', urlencodedParser, function(req,res){
   req.sanitizeBody('mapscale').escape();
   req.sanitizeBody('height').escape();
   req.sanitizeBody('fontsize').escape();
-  req.sanitizeBody('padding').escape();
+  req.sanitizeBody('paddingsize').escape();
 
 
   // make server check input in order of priority
@@ -67,7 +95,8 @@ app.post('/form', urlencodedParser, function(req,res){
   req.checkBody("maxLat", "Input a maximum latitude value.").notEmpty();
   req.checkBody("maxLon", "Input a maximum longitude value.").notEmpty();
 
-
+  req.body.lon_major_ticks = decipherArrayFromString(req.body.lon_major_ticks);
+  req.body.lon_minor_ticks = decipherArrayFromString(req.body.lon_minor_ticks);
   req.checkBody("lon_major_ticks", "Input Longtitude Major Ticks value(s).").notEmpty();
   req.checkBody("lon_major_ticks", "Input Longtitude Major Ticks value(s).").notEmpty();
 
@@ -92,7 +121,7 @@ app.post('/form', urlencodedParser, function(req,res){
 
   req.checkBody("fontsize", "Input a value for Font Size.").notEmpty();
 
-  req.checkBody("padding", "Input a value for Padding.").notEmpty();
+  req.checkBody("paddingsize", "Input a value for Padding.").notEmpty();
 
   let inputHolder = [
     req.body.proj_string,
@@ -101,10 +130,8 @@ app.post('/form', urlencodedParser, function(req,res){
     req.body.minLon,
     req.body.maxLat,
     req.body.maxLon,
-
     req.body.lon_major_ticks,
     req.body.lon_minor_ticks,
-
     req.body.nnodes,
     req.body.cliplat,
 
@@ -116,7 +143,7 @@ app.post('/form', urlencodedParser, function(req,res){
 
     req.body.fontsize,
 
-    req.body.padding
+    req.body.paddingsize
   ]
 
   var errors = req.validationErrors();
@@ -146,7 +173,7 @@ app.post('/form', urlencodedParser, function(req,res){
     let hasmapscaleError = false;
     let hasheightError = false;
     let hasfontsizeError= false;
-    let haspaddingError= false;
+    let haspaddingsizeError= false;
 
     // chain errors, and maintain error priority
     for (let i = 0; i< errors.length; i++) {
@@ -212,13 +239,19 @@ app.post('/form', urlencodedParser, function(req,res){
         errorsString += errors[i].msg + "\n";
         errorHolder[12] = errors[i].msg;
 
-      } else if(errors[i].param === "padding" && !haspaddingError) {
-        haspaddingError = true;
+      } else if(errors[i].param === "paddingsize" && !haspaddingsizeError) {
+        haspaddingsizeError = true;
         errorsString += errors[i].msg + "\n";
         errorHolder[13] = errors[i].msg;
 
       }
     }
+
+    // remove brackets from last lon major/minor tick fields because clearly something has an error
+     inputHolder[5] = (req.body.lon_major_ticks).toString();
+     inputHolder[6] = (req.body.lon_minor_ticks).toString();
+
+
      res.render('form', {
        title: "Form",
        specificErrors: errorHolder,
@@ -230,8 +263,6 @@ app.post('/form', urlencodedParser, function(req,res){
      res.render("dataDisplay", {entries: inputHolder});
 
      // TODO: change padding to padding size and titles everywhere
-     // TODO: Make it happen, cap'n
-     // soon will move string "number arrays" to actual number arrays
      // req.body.lon_major_ticks = decipherArraysFromStrings(req.body.lon_major_ticks)
      // req.body.lon_minor_ticks = decipherArraysFromStrigns(req.body.lon_minor_ticks);
      ///res.send({entries: [req.body]});
@@ -245,6 +276,9 @@ app.use(function(req, res, next) {
   err.status = 404;
   next(err);
 });
+
+
+
 
 // error handler
 app.use(function(err, req, res, next) {

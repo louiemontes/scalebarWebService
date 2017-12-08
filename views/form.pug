@@ -32,12 +32,12 @@ block content
 
       p Longitude Major Ticks: [ 
         input(type='text', name='lon_major_ticks', value=specificInputs[5], title='Distance(s) at which major ticks are to be drawn and labeled.')
-        span  ] km 
+        span  ] km (input numbers with commas) 
         span(class ="errors")   #{specificErrors[5]}
 
       p Longitude Minor Ticks: [ 
         input(type='text', name='lon_minor_ticks', value=specificInputs[6], title='Distance(s) at which minor ticks are to be drawn, but not labeled.')
-        span  ] km 
+        span  ] km (input numbers with commas) 
         span(class ="errors")   #{specificErrors[6]}
 
       p Smoothness: 
@@ -66,8 +66,8 @@ block content
         input(type='number', name='fontsize', value=specificInputs[12], min='1', title='Font size.')
         span(class ="errors")   #{specificErrors[12]}
 
-      p Padding: 
-        input(type='number', name='padding', value=specificInputs[13], min='1', step='1', title='Padding of SVG map.')
+      p Padding size: 
+        input(type='number', name='paddingsize', value=specificInputs[13], min='1', step='1', title='Padding of SVG map.')
         span(class ="errors")   #{specificErrors[13]}
 
       br
